@@ -172,3 +172,5 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+/datasets/KDD_CUP_1999/
+.idea
