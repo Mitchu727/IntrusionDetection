@@ -1,8 +1,0 @@
-population_size: 20
-dimensions_number: 25
-c1: 2
-c2: 2
-w: 0.75
-k: 15
-iterations_number: 100
-cross_validation_folds: 10
