@@ -26,9 +26,9 @@ import numpy as np
 PSO_KNN_RESULTS_CSV = "results_PSO+kNN.csv"
 KNN_RESULTS_CSV = "results_kNN.csv"
 
-def log_results(df: pd.DataFrame):
-    header = not Path(PSO_KNN_RESULTS_CSV).exists()
-    df.to_csv(PSO_KNN_RESULTS_CSV, mode="a", index=False, header=header)
+def log_results(df: pd.DataFrame, filename: str):
+    header = not Path(filename).exists()
+    df.to_csv(filename, mode="a", index=False, header=header)
 
 def preprocess_data(dataset: pd.DataFrame):
     # Drop the unnamed index column
@@ -66,6 +66,10 @@ def load_dataset(n_dims: int):
         random_state=42,
         stratify=y_multi
     )
+
+    labels, counts = np.unique(y_multi, return_counts=True)
+    for label, count in zip(labels, counts):
+        print(f"{label}: {count}")
 
     return X_train, X_test, y_bin_train, y_bin_test, y_multi_train, y_multi_test
 
@@ -188,17 +192,64 @@ def run_experiment_pso_knn(config_path: str):
     })
 
     logs_df = pd.DataFrame(rows)
-    log_results(logs_df)
+    log_results(logs_df, PSO_KNN_RESULTS_CSV)
     print(f"[INFO] PSO+kNN test results logged to {PSO_KNN_RESULTS_CSV}")
 
-# TODO
 def run_experiment_knn(config_path: str):
     print(f"[INFO] Running kNN aglorithm experiment...")
     with open(config_path) as file:
         config = yaml.safe_load(file)
 
-    X_train, X_test, y_train, y_test = load_dataset(config["dimensions_number"])
+    (X_train, X_test, 
+     y_bin_train, y_bin_test, 
+     y_multi_train, y_multi_test) = load_dataset(config["dimensions_number"])
+    
     knn = KNeighborsClassifier(n_neighbors=config["k"])
-    knn.fit(X_train, y_train)
-    test_accuracy = knn.score(X_test, y_test)
-    print(f"[INFO] Test accuracy: {test_accuracy:.3f}")
+    knn.fit(X_train, y_bin_train)
+
+    print(f"[INFO] Evaluation in progress...")
+
+    # Binary classification evaluation
+    y_bin_pred = knn.predict(X_test)
+    overall_accuracy = accuracy_score(y_bin_test, y_bin_pred)
+    overall_idr = idr_score(y_bin_test, y_bin_pred)
+
+    # One-vs-all evaluation for each attack type
+    attack_types = [c for c in np.unique(y_multi_train) if c != "Normal"]
+    rows = []
+    timestamp = datetime.now().isoformat()
+
+    for attack in attack_types:
+        y_train_ova = (y_multi_train == attack).astype(int)
+        y_test_ova = (y_multi_test == attack).astype(int)
+
+        knn_ova = KNeighborsClassifier(n_neighbors=config["k"])
+        knn_ova.fit(X_train, y_train_ova)
+        y_pred_ova = knn_ova.predict(X_test)
+
+        accuracy_ova = accuracy_score(y_test_ova, y_pred_ova)
+        idr_ova = idr_score(y_test_ova, y_pred_ova)
+
+        rows.append({
+            "timestamp": timestamp,
+            "algorithm": "kNN",
+            "k": config["k"],
+            "n_dims": config["dimensions_number"],
+            "attack_type": attack,
+            "accuracy": accuracy_ova,
+            "IDR": idr_ova
+        })
+
+    rows.append({
+        "timestamp": timestamp,
+        "algorithm": "kNN",
+        "k": config["k"],
+        "n_dims": config["dimensions_number"],
+        "attack_type": "all_attacks",
+        "accuracy": overall_accuracy,
+        "IDR": overall_idr
+    })
+
+    logs_df = pd.DataFrame(rows)
+    log_results(logs_df, KNN_RESULTS_CSV)
+    print(f"[INFO] kNN test results logged to {KNN_RESULTS_CSV}")
