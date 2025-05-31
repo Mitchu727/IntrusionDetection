@@ -23,9 +23,6 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 
-PSO_KNN_RESULTS_CSV = "results_PSO+kNN.csv"
-KNN_RESULTS_CSV = "results_kNN.csv"
-
 def log_results(df: pd.DataFrame, filename: str):
     header = not Path(filename).exists()
     df.to_csv(filename, mode="a", index=False, header=header)
@@ -83,6 +80,8 @@ def run_experiment_pso_knn(config_path: str):
     print(f"[INFO] Running PSO+kNN aglorithm experiment...")
     with open(config_path) as file:
         config = yaml.safe_load(file)
+
+    PSO_KNN_RESULTS_CSV = f"results_PSO+kNN_k={config['k']}.csv"
 
     (X_train, X_test, 
      y_bin_train, y_bin_test, 
@@ -199,6 +198,8 @@ def run_experiment_knn(config_path: str):
     print(f"[INFO] Running kNN aglorithm experiment...")
     with open(config_path) as file:
         config = yaml.safe_load(file)
+
+    KNN_RESULTS_CSV = f"results_kNN_k={config['k']}.csv"
 
     (X_train, X_test, 
      y_bin_train, y_bin_test, 
