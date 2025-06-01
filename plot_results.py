@@ -69,11 +69,13 @@ if "all_attacks" in attack_types:
     attack_types.remove("all_attacks")
 
 n_attacks = len(attack_types)
-n_columns = 2
+n_columns = 3
 n_rows = int(np.ceil(n_attacks / n_columns))
 
 # 2.1 Accuracy
-fig, axes = plt.subplots(n_rows, n_columns, figsize=(12, 4 * n_rows), squeeze=False)
+fig, axes = plt.subplots(n_rows, n_columns, figsize=(14, 3 * n_rows), squeeze=False)
+fig.suptitle("Per‐Attack Accuracy vs. k (kNN vs. PSO+kNN)", fontsize=16)
+
 for idx, attack in enumerate(attack_types):
     row = idx // n_columns
     column = idx % n_columns
@@ -91,7 +93,7 @@ for idx, attack in enumerate(attack_types):
             color=colors[alg]
         )
 
-    ax.set_title(f"Accuracy vs. k\n(attack = {attack})")
+    ax.set_title(f"Attack = {attack}")
     ax.set_xticks(sorted(df["k"].unique()))
     ax.set_xlabel("k")
     ax.set_ylabel("Accuracy")
@@ -106,7 +108,9 @@ plt.tight_layout()
 plt.show()
 
 # 2.2 IDR
-fig, axes = plt.subplots(n_rows, n_columns, figsize=(12, 4 * n_rows), squeeze=False)
+fig, axes = plt.subplots(n_rows, n_columns, figsize=(14, 3 * n_rows), squeeze=False)
+fig.suptitle("Per‐Attack IDR vs. k (kNN vs. PSO+kNN)", fontsize=16)
+
 for idx, attack in enumerate(attack_types):
     row = idx // n_columns
     column = idx % n_columns
@@ -124,7 +128,7 @@ for idx, attack in enumerate(attack_types):
             color=colors[alg]
         )
 
-    ax.set_title(f"IDR vs. k\n(attack = {attack})")
+    ax.set_title(f"Attack = {attack}")
     ax.set_xticks(sorted(df["k"].unique()))
     ax.set_xlabel("k")
     ax.set_ylabel("IDR")
