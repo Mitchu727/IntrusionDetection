@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 algorithms = ["kNN", "PSO+kNN"]
 k_values = [1, 3, 5, 10, 15, 20]
 
+colors = {"kNN": "slateblue", "PSO+kNN": "goldenrod"}
 df_list = []
 
 for alg in algorithms:
@@ -31,7 +32,8 @@ for alg in acc_pivot.columns:
         acc_pivot.index,
         acc_pivot[alg],
         marker="o",
-        label=alg
+        label=alg,
+        color=colors[alg]
     )
 plt.xticks(acc_pivot.index)
 plt.xlabel("k (number of neighbours)")
@@ -49,7 +51,8 @@ for alg in idr_pivot.columns:
         idr_pivot.index,
         idr_pivot[alg],
         marker="o",
-        label=alg
+        label=alg,
+        color=colors[alg]
     )
 plt.xticks(idr_pivot.index)
 plt.xlabel("k (number of neighbours)")
@@ -84,7 +87,8 @@ for idx, attack in enumerate(attack_types):
             pivot_acc.index,
             pivot_acc[alg],
             marker="o",
-            label=alg
+            label=alg,
+            color=colors[alg]
         )
 
     ax.set_title(f"Accuracy vs. k\n(attack = {attack})")
@@ -116,7 +120,8 @@ for idx, attack in enumerate(attack_types):
             pivot_idr.index,
             pivot_idr[alg],
             marker="o",
-            label=alg
+            label=alg,
+            color=colors[alg]
         )
 
     ax.set_title(f"IDR vs. k\n(attack = {attack})")
@@ -134,8 +139,8 @@ plt.tight_layout()
 plt.show()
 
 # 3. Bar charts
-k_values = [5, 10, 15]
-ks = sorted(df["k"].unique())
+ks = [5, 10, 15] # [1, 2, 3, 5, 10, 15, 20]
+# ks = sorted(df["k"].unique())
  
 # 3.1 Accuracy
 for current_k in ks:
@@ -155,13 +160,15 @@ for current_k in ks:
         ind,
         pivot_acc["kNN"],
         width,
-        label="kNN"
+        label="kNN",
+        color=colors["kNN"]
     )
     ax.bar(
         ind + width,
         pivot_acc["PSO+kNN"],
         width,
-        label="PSO+kNN"
+        label="PSO+kNN",
+        color=colors["PSO+kNN"]
     )
     ax.set_xlabel("Attack Type")
     ax.set_ylabel("Accuracy")
@@ -193,13 +200,15 @@ for current_k in ks:
         ind,
         pivot_idr["kNN"],
         width,
-        label="kNN"
+        label="kNN",
+        color=colors["kNN"]
     )
     ax.bar(
         ind + width,
         pivot_idr["PSO+kNN"],
         width,
-        label="PSO+kNN"
+        label="PSO+kNN",
+        color=colors["PSO+kNN"]
     )
     ax.set_xlabel("Attack Type")
     ax.set_ylabel("Accuracy")
