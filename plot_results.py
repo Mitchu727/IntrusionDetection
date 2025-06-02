@@ -215,8 +215,8 @@ for current_k in ks:
         color=colors["PSO+kNN"]
     )
     ax.set_xlabel("Attack Type")
-    ax.set_ylabel("Accuracy")
-    ax.set_title(f"Per‐Attack Accuracy (k = {current_k})\n(kNN vs. PSO+kNN)")
+    ax.set_ylabel("IDR")
+    ax.set_title(f"Per‐Attack IDR (k = {current_k})\n(kNN vs. PSO+kNN)")
     ax.set_xticks(ind + width / 2)
     ax.set_xticklabels(attack_types, rotation=45, ha="right")
     ax.legend()
